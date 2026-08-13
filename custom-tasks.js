@@ -28,7 +28,7 @@
       <label>Título da tarefa<input name="title" maxlength="100" required placeholder="Ex.: Conferir notas fiscais"></label>
       <label>Área<select name="area"><option>Salão</option><option>Atacado</option><option>Financeiro</option><option>Gestão</option></select></label>
       <label>Frequência<select name="frequency"><option>Única</option><option>Diária</option><option>Semanal</option><option>Quinzenal</option><option>Mensal</option></select></label>
-      <label>Data ou referência<input name="when" maxlength="60" placeholder="Ex.: toda terça-feira"></label>
+      <label>Data da tarefa<input name="date" type="date"></label><label>Data ou referência<input name="when" maxlength="60" placeholder="Ex.: toda terça-feira"></label>
       <label class="wide">Descrição ou observação<textarea name="description" maxlength="300" placeholder="Detalhes importantes para realizar a tarefa"></textarea></label>
       <div class="form-actions"><button class="primary" type="submit">Adicionar tarefa</button></div>
     </form>
@@ -41,6 +41,13 @@
     localStorage.setItem(DONE, JSON.stringify(customDone));
   }
   function renderCustom() {
+    const today = new Date(), todayIso = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    document.querySelectorAll('[data-custom-today]').forEach(item => item.remove());
+    const todayTasks = customTasks.filter(task => task.date === todayIso || (!task.date && task.frequency === 'Única'));
+    const todayList = document.querySelector('#today');
+    todayTasks.forEach(task => todayList.insertAdjacentHTML('beforeend', `<article class="card ${customDone[task.id] ? 'done' : ''}" data-custom-today data-custom-id="${task.id}"><button class="check custom-check">${customDone[task.id] ? '✓' : ''}</button><div class="copy"><div class="meta">${task.area} · ${task.frequency}</div><h3>${escapeHtml(task.title)}</h3>${task.description ? `<p>${escapeHtml(task.description)}</p>` : ''}</div><span class="status">${customDone[task.id] ? 'Concluído' : 'Pendente'}</span></article>`));
+    const pending = document.querySelector('#pending');
+    if (pending) pending.textContent = (Number.parseInt(pending.textContent) + todayTasks.filter(task => !customDone[task.id]).length) + ' pendente(s)';
     const list = document.querySelector('#custom-list');
     document.querySelector('#custom-count').textContent = `${customTasks.length} tarefa(s)`;
     if (!customTasks.length) {
@@ -72,9 +79,9 @@
     customTasks.unshift({
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       title: data.get('title').trim(), area: data.get('area'), frequency: data.get('frequency'),
-      when: data.get('when').trim(), description: data.get('description').trim(), createdAt: new Date().toISOString()
+      when: data.get('when').trim(), date: data.get('date'), description: data.get('description').trim(), createdAt: new Date().toISOString()
     });
-    persist(); event.currentTarget.reset(); renderCustom();
+    persist(); event.currentTarget.reset(); document.querySelector('.nav button[data-view="geral"]').click(); renderCustom();
   });
 
   document.querySelectorAll('.nav button').forEach(navButton => navButton.onclick = () => {
@@ -83,6 +90,10 @@
     ['geral','rotinas','calendario','nova'].forEach(id => document.querySelector(`#${id}`).classList.toggle('hidden', id !== navButton.dataset.view));
     document.querySelector('#heading').textContent = navButton.textContent.replace(/[⌂✓□＋]/, '').trim();
   });
+  const originalRender = render;
+  render = () => { originalRender(); renderCustom(); };
+  const dateInput = document.querySelector('[name="date"]');
+  if (dateInput) dateInput.valueAsDate = new Date();
   renderCustom();
 })();
 
