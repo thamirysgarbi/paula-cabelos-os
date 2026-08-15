@@ -5,6 +5,20 @@
   let customTasks = load(STORAGE, []);
   let customDone = load(DONE, {});
 
+  const plannedTasks = [
+    { id: 'planejada-2026-08-15-fita-azul', title: 'Avisar a Paula que precisa comprar fita azul', description: 'Alinhar a compra da fita azul necessária para a operação.', area: 'Gestão', frequency: 'Única', when: 'Hoje', date: '2026-08-15' },
+    { id: 'planejada-2026-08-15-estoque-itens', title: 'Lançar estoque dos itens que a Paula solicitou', description: 'Registrar no estoque todos os itens solicitados pela Paula.', area: 'Gestão', frequency: 'Única', when: 'Hoje', date: '2026-08-15' },
+    { id: 'planejada-2026-08-15-wati-recepcao', title: 'Conectar o número da recepção na WATI', description: 'Configurar e validar o número da recepção na plataforma WATI.', area: 'Gestão', frequency: 'Única', when: 'Hoje', date: '2026-08-15' },
+    { id: 'planejada-2026-08-15-whatsapp-celulares', title: 'Deixar o WhatsApp Business das vendedoras e da recepção redondo', description: 'Padronizar perfil comercial, mensagens automáticas, etiquetas, catálogo, segurança, backup e permissões; integrar a recepção à WATI e testar envio e recebimento em todos os aparelhos.', area: 'Gestão', frequency: 'Única', when: 'Hoje', date: '2026-08-15' },
+    { id: 'planejada-2026-08-15-planilha-retornos', title: 'Atualizar planilha de retornos dos últimos 2 meses', description: 'Puxar os dados dos últimos dois meses e atualizar a base de retornos.', area: 'Gestão', frequency: 'Única', when: 'Hoje', date: '2026-08-15' },
+    { id: 'planejada-2026-08-15-segmentar-retornos', title: 'Formatar e segmentar planilha de retornos', description: 'Organizar a planilha e separar os contatos por grupos de campanha.', area: 'Gestão', frequency: 'Única', when: 'Hoje', date: '2026-08-15' },
+    { id: 'planejada-2026-08-15-campanha-retornos', title: 'Criar campanha WATI para retornos', description: 'Preparar a campanha direcionada aos clientes da planilha de retornos.', area: 'Gestão', frequency: 'Única', when: 'Hoje', date: '2026-08-15' },
+    { id: 'planejada-2026-08-15-campanha-google', title: 'Criar campanha WATI para contatos do Google Contacts', description: 'Preparar uma campanha para a base de contatos do Google Contacts.', area: 'Gestão', frequency: 'Única', when: 'Hoje', date: '2026-08-15' }
+  ];
+  const existingTaskIds = new Set(customTasks.map(task => task.id));
+  customTasks = [...plannedTasks.filter(task => !existingTaskIds.has(task.id)), ...customTasks];
+  localStorage.setItem(STORAGE, JSON.stringify(customTasks));
+
   const style = document.createElement('style');
   style.textContent = `
     .task-form{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;box-shadow:0 5px 16px #5d364508}
