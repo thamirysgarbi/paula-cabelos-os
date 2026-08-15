@@ -57,11 +57,12 @@
   function renderCustom() {
     const today = new Date(), todayIso = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
     document.querySelectorAll('[data-custom-today]').forEach(item => item.remove());
+    const recurringPending = document.querySelectorAll('#today > .card:not(.done)').length;
     const todayTasks = customTasks.filter(task => task.date === todayIso || (!task.date && task.frequency === 'Única'));
     const todayList = document.querySelector('#today');
     todayTasks.forEach(task => todayList.insertAdjacentHTML('beforeend', `<article class="card ${customDone[task.id] ? 'done' : ''}" data-custom-today data-custom-id="${task.id}"><button class="check custom-check">${customDone[task.id] ? '✓' : ''}</button><div class="copy"><div class="meta">${task.area} · ${task.frequency}</div><h3>${escapeHtml(task.title)}</h3>${task.description ? `<p>${escapeHtml(task.description)}</p>` : ''}</div><span class="status">${customDone[task.id] ? 'Concluído' : 'Pendente'}</span></article>`));
     const pending = document.querySelector('#pending');
-    if (pending) pending.textContent = (Number.parseInt(pending.textContent) + todayTasks.filter(task => !customDone[task.id]).length) + ' pendente(s)';
+    if (pending) pending.textContent = (recurringPending + todayTasks.filter(task => !customDone[task.id]).length) + ' pendente(s)';
     const list = document.querySelector('#custom-list');
     document.querySelector('#custom-count').textContent = `${customTasks.length} tarefa(s)`;
     if (!customTasks.length) {
@@ -74,7 +75,7 @@
         <div class="copy"><div class="meta">${task.area} · ${task.frequency}</div><h3>${escapeHtml(task.title)}</h3>${task.description ? `<p>${escapeHtml(task.description)}</p>` : ''}<div class="custom-date">${escapeHtml(task.when || 'Sem data definida')}</div></div>
         <button class="delete-task" title="Excluir tarefa">Excluir</button>
       </article>`).join('');
-    list.querySelectorAll('.custom-check').forEach(item => item.onclick = () => {
+    document.querySelectorAll('.custom-check').forEach(item => item.onclick = () => {
       const id = item.closest('[data-custom-id]').dataset.customId;
       customDone[id] = !customDone[id]; persist(); renderCustom();
     });
